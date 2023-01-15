@@ -1,73 +1,23 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+Me pasaron el desafío el viernes 13 a las 17hs pero empecé a revisarlo y desarrollar hace unas 5 horas. Tengo este desarrollo para entregar ahora, después de las casi 48 horas.
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+No están todos los requisitos cumplidos, pero tengo una idea de cómo implementar lo que me falta, y lo voy a hacer próximamente a pesar de haberme quedado sin tiempo.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Paso a explicar lo que se logró:
+- Una API en Node.js con TypeScript desarrollada usando el Framework Nest.js.
+- Se conecta a una base de datos SQL (mediante Postgres).
+  - Tiene las siguientes tablas:
+    - 'word': guarda todas las palabras que considera el juego.
+    - 'game': guarda todas las partidas que crea el juego.
+  - Está sólo en mi computadora, así que se la tendría que recrear en el equipo donde se quiera probar esta API.
+- La carpeta 'world-loader-script' contiene el diccionario 'words.txt' junto a un script. Con el comando 'npm run generate-insert-sql-query-from-words-txt' en la raíz del proyecto (después de 'npm install'), se consume ese diccionario y se prepara una consulta SQL para insertar todas las palabras en la base de datos.
+- Mientras el servidor esté funcionando, cada 5 minutos crea una nueva partida en la base de datos, eligiendo una palabra al azar que no se haya usado antes en una partida.
+- El servidor expone un endpoint 'POST /wordle/guess-word/:gameId' que acepta el ID de una partida, y una palabra para intentar adivinar la del juego. El endpoint devuelve los resultados del intento correctamente.
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
-```bash
-$ npm install
-```
-
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+Falta:
+- Un sistema de autenticación que permita registrar usuarios y luego loguearse con los mismos, para obtener un token que permita acceder a los endpoints protegidos de la API. 
+- Un modo de persistir la cantidad de intentos que cada usuario hizo por partida (lo lograría con una tabla intermedia 'UserGame' entre otra tabla 'User' y 'Game'.
+- Que el cron reinicie esa información persistida de intentos cada 5 minutos.
+- Persistir en 'UserGame' un campo que indique si el usuario adivinó o no la palabra.
+- Un endpoint que revise la tabla 'UserGame' para saber la cantidad de veces que cada usuario adivinó la palabra, y devuelva los que más lo hayan logrado.
+- Un endpoint similar al anterior pero que revise el campo en relación a las palabras.
+- Pruebas para los controladores y los servicios con Jest.
